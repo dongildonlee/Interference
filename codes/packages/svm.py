@@ -1,5 +1,6 @@
 import numpy as np
 import random
+from sklearn.preprocessing import StandardScaler
 
 def gen_SVM_input(nidx, sidx, rep_per_ns_combo, img_inst):
     ###########################################################
@@ -59,16 +60,22 @@ def get_y(df_idx):
     return y
 
 
-def SVM_fit2(df_train, df_test, units, actv):
+def SVM_fit(units, actv, exp):
     ###########################################################
     ## INPUT:
     #   1. units: unit IDs used for SVM training
     #   2. actv: activity matrix
+    #   3. exp: experiment #
     ## OUTPUT:
     #   An array of prediction from the classifier
     ###########################################################
+    # Get classifier:
     clf = make_pipeline(LinearSVC(random_state=1234, tol=1e-5, max_iter=1000000))
     scaler = StandardScaler()
+    # Get training and test sets for experiment (exp):
+    dir_path = os.path.dirname(os.path.realpath('../'))
+    df_train = pd.read_csv(dir_path+'/dataframes/training_sets/training set idx for exp'+str(exp)+'.csv',index_col=0)
+    df_test = pd.read_csv(dir_path+'/dataframes/test_sets/test set idx for exp'+str(exp) + '.csv', index_col=0)
 
     # Process training data and fit classifier:
     X_tr = get_SVM_actv(df_train, units, actv)
