@@ -15,7 +15,7 @@ num_units = 100
 rate_threshold = 0.05
 #########################################
 
-path_for_units = 'dataframes/SVM/units/'+str(num_samples)+' units sampled from distribution higher than '+str(rate_threshold)+' response rate including PN2 and PN20/'
+path_for_units = 'dataframes/SVM/units/'+str(num_units)+' units sampled from distribution higher than '+str(rate_threshold)+' response rate including PN2 and PN20/'
 set_folder='dataframes/SVM' # retrieve training/test sets
 save_to_folder= 'dataframes/SVM_prediction'
 
