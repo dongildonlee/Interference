@@ -1,6 +1,10 @@
 import numpy as np
+import pandas as pd
 import random
+import os
 from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import make_pipeline
+from sklearn.svm import LinearSVC
 
 def gen_SVM_input(nidx, sidx, rep_per_ns_combo, img_inst):
     ###########################################################
@@ -36,7 +40,7 @@ def get_SVM_actv(df_idx, units, actv):
     ## OUTPUT:
     #   1. X: activity corresponding to the input dataframe
     ###########################################################
-    d = SVM_idx
+    d = df_idx
     actv_list=[]
     for im in d.index:
         #print(im)
@@ -74,8 +78,8 @@ def SVM_fit(units, actv, exp):
     scaler = StandardScaler()
     # Get training and test sets for experiment (exp):
     dir_path = os.path.dirname(os.path.realpath('../'))
-    df_train = pd.read_csv(dir_path+'/dataframes/training_sets/training set idx for exp'+str(exp)+'.csv',index_col=0)
-    df_test = pd.read_csv(dir_path+'/dataframes/test_sets/test set idx for exp'+str(exp) + '.csv', index_col=0)
+    df_train = pd.read_csv(dir_path+'/dataframes/SVM/training_sets/training set idx for exp'+str(exp)+'.csv',index_col=0)
+    df_test = pd.read_csv(dir_path+'/dataframes/SVM/test_sets/test set idx for exp'+str(exp) + '.csv', index_col=0)
 
     # Process training data and fit classifier:
     X_tr = get_SVM_actv(df_train, units, actv)
