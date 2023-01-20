@@ -59,8 +59,7 @@ def get_selectivity(df_anova2):
     # Input:
     #   1. df_anova2: dataframe with anova2 (2-way ANOVA) results
     # Output:
-    #   number, size, number-size with no interaction
-    #   number-size with interaction units
+    #   a dataframe with selectivity for number, size and both
     ########################################################
     df_selectivity = pd.DataFrame(index=df_anova2.index.to_numpy(), columns=['selectivity'])
     unit_noresponse = df_anova2.index[np.sum(df_anova2.isnull().iloc[:,0:3],axis=1)==3].to_numpy()
