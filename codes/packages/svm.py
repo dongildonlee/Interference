@@ -94,3 +94,54 @@ def SVM_fit(units, actv, exp):
     y_pred = np.array([clf.predict([X_tst_scld[i,:]])[0] for i in np.arange(X_tst_scld.shape[0])])
 
     return y_pred
+
+
+def get_all_text_X(exps):
+    ###########################################################
+    ## INPUT:
+    #   1. exps: SVM test trial #
+    ## OUTPUT:
+    #   SVM test trials with number size index in a dataframe
+    ###########################################################
+
+    dir_path = os.path.dirname(os.path.realpath('../'))
+    all_test_X = pd.concat([pd.read_csv(dir_path+'/dataframes/SVM/test_sets/test set idx for exp'+str(exp) + '.csv').drop(columns=['Unnamed: 0']) for exp in exps])
+    all_test_X.index = np.arange(all_test_X.shape[0])
+    return all_test_X
+
+
+def get_all_preds(net, relu, epoch, num_samples, selectivity, exps):
+    dir_path = os.path.dirname(os.path.realpath('../'))
+    all_preds=pd.concat([pd.read_csv(dir_path+'/dataframes/SVM_predictions/SVM prediction of He untrained net'+str(net)+' relu'+str(relu)+' epoch'+str(epoch)+' '+str(num_samples)+' '+str(selectivity)+' units that are randomly drawn from distribution exp' + str(exp)+ ' Jan2023.csv').drop(columns=['Unnamed: 0']) for exp in exps])
+    all_preds.index = np.arange(all_preds.shape[0])
+    return all_preds
+
+
+def get_SVM_accuracy(pair_idx, all_test_X, all_preds):
+    test_arr = ((all_test_X['num1'] > all_test_X['num2'])*2-1).to_numpy()[pair_idx]
+    pred_arr = all_preds['0'].to_numpy()[pair_idx]
+    accuracy = sum(test_arr == pred_arr)/len(test_arr)
+    return accuracy
+
+
+def get_all_preds_temp(file):
+    all_preds=pd.concat([pd.read_csv(file+' exp' + str(exp)+ ' Dec12.csv').drop(columns=['Unnamed: 0']) for exp in np.arange(1,11)])
+    all_preds.index = np.arange(all_preds.shape[0])
+    return all_preds
+
+
+def get_congruency(test_X, variable):
+    ###########################################################
+    ## INPUT:
+    #   1. test_X: SVM test set in dataframe
+    #   2. variable: currently only 'dot size' available
+    ## OUTPUT:
+    #   congruent and incongruent trial indices
+    ###########################################################
+    if variable == 'dot size':
+        c1 = test_X.index.to_numpy()[(test_X['num1']<test_X['num2'])*(test_X['sz1']<test_X['sz2'])]
+        c2 = test_X.index.to_numpy()[(test_X['num1']>test_X['num2'])*(test_X['sz1']>test_X['sz2'])]
+        c = np.union1d(c1,c2)
+        ic = np.setdiff1d(test_X.index.to_numpy(), c)
+
+    return c, ic
