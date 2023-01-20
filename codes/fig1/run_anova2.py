@@ -1,33 +1,56 @@
-for net in np.arange(9,11):
+import numpy as np
+import pandas as pd
+import os
+import time
+from joblib import Parallel, delayed
+sys.path.append('../')
+from packages import stats
+
+############# Parameters ########################
+relu=5
+nets = np.arange(1,3)
+epochs=np.arange(0,91,10)
+units = np.arange(43264) # unique to Relu5 layer
+num_blocks = 8
+num_units_per_block = int(43264/num_blocks)
+
+numbers = np.arange(2,21,2)
+min_sz_idx=3; max_sz_idx=9
+sizes = np.arange(4,14)[min_sz_idx: min_sz_idx+1]
+#################################################
+
+dir_path = os.path.dirname(os.path.realpath('../'))
+
+for net in nets:
     print("net:", net)
-    for epoch in np.array([10,20,40,50,70,80]):
+    for epoch in epochs:
         print("epoch:", epoch)
-        #f500 = h5py.File('RESEARCH (updated June 23)/raw response/He/Untrained/actv_f500_network'+str(net)+'.mat','r')
-        f500 = h5py.File('raw response/He/relu'+str(relu)+'/Epochs/actv_f500_network'+str(net)+'_relu'+str(relu)+'_epoch'+str(epoch)+'.mat', 'r')
+
+        # Load raw response of AlexNet and perform a transpose for a better readability:
+        f500 = h5py.File(dir_path+'/data/raw_response/actv_f500_network'+str(net)+'_relu'+str(relu)+'_epoch'+str(epoch)+'.mat', 'r')
         actv_=f500['actv'][:]
         actv = np.transpose(actv_, (2,1,0))
-        #actv_2D = actv.reshape(actv.shape[0], actv.shape[1]*actv.shape[2])
 
         # Take activity corresponding to size 7 to 13:
         take = np.arange(0,100).reshape(10,10)[:,min_sz_idx:max_sz_idx+1].reshape(len(numbers)*(max_sz_idx-min_sz_idx+1))
         actv_szAtoB = actv[:,take,:]
         actv_2D = actv_szAtoB.reshape(actv_szAtoB.shape[0], actv_szAtoB.shape[1]*actv_szAtoB.shape[2])
+
+        # Make a dataframe to store ANOVA2 results:
         df_anova2 = pd.DataFrame(index=units, columns = ['number', 'size', 'inter', 'residual'])
+
         ## Perform 2-way ANOVA with parallel computing:
-
-
-        for tt in np.arange(num_blocks):
+        for bk in np.arange(num_blocks): # to minimize the impact of occassional occurrence of 'SVD did not converge' error
+            print("block:", bk)
             try:
-                #unt = np.arange(tt*1352, (tt+1)*1352)
-                unt = np.arange(tt*4056, (tt+1)*4056)
+                unit_idx = np.arange(bk*num_units_per_block, (bk+1)*num_units_per_block)
                 start_time = time.time()
-                stats = Parallel(n_jobs=-1)(delayed(ffns.anova2_single)(actv_2D, un, numbers, sizes, inst) for un in unt)
+                stats = Parallel(n_jobs=-1)(delayed(stats.anova2_single)(actv_2D, u, numbers, sizes, inst) for u in unit_idx)
                 print("--- %s seconds ---" % (time.time() - start_time))
 
-                ## Save the data:
-                #stats_pval = pd.concat(stats).iloc[:,3].to_numpy().reshape(1352,4)
-                stats_pval = pd.concat(stats).iloc[:,3].to_numpy().reshape(4056,4)
-                df_anova2.iloc[unt,:]=stats_pval
+                ## Save the data (save every time a block is complete):
+                stats_pval = pd.concat(stats).iloc[:,3].to_numpy().reshape(num_units_per_block,4)
+                df_anova2.iloc[unit_idx,:]=stats_pval
                 df_anova2.to_csv('ANOVA2 results/He/Relu'+str(relu)+'/size7to13/df_anova2 for He initialized net'+str(net)+'_relu'+str(relu)+'_epoch'+str(epoch)+' size 7to13 500inst.csv')
             except:
                 continue
