@@ -14,7 +14,7 @@ epochs=np.arange(0,31,10)
 exps = np.arange(1,11) # SVM test trials
 
 selectivity = 'both'
-num_samples = 100
+num_units = 100
 congruency=np.array(['C','IC'])
 #########################################
 
@@ -40,7 +40,7 @@ for epoch in epochs:
     print("epoch:", epoch)
     for net in nets:
         print("net:", net)
-        all_preds = svm.get_all_preds(net=net, relu=relu, epoch=epoch, selectivity=selectivity, num_samples=num_samples, exps=exps)
+        all_preds = svm.get_all_preds(net=net, relu=relu, epoch=epoch, selectivity=selectivity, num_units=num_units, exps=exps)
         acc_C = svm.get_SVM_accuracy(c, all_test_X, all_preds)
         acc_IC = svm.get_SVM_accuracy(ic, all_test_X, all_preds)
         df_SVM_accuracy.iloc[i:i+2,3] = [acc_C, acc_IC]
