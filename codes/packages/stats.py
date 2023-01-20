@@ -62,18 +62,19 @@ def get_selectivity(df_anova2):
     #   number, size, number-size with no interaction
     #   number-size with interaction units
     ########################################################
-    unit_noresponse = df_anova2.index[np.sum(df_anova2.isnull().iloc[:,0:3],axis=1)==3].to_numpy() # unresponsive units
-    df_anova2 = df_anova2.drop(labels=unit_noresponse) # remove unresponsive units
+    df_selectivity = pd.DataFrame(index=df_anova2.index.to_numpy(), columns=['selectivity'])
+    unit_noresponse = df_anova2.index[np.sum(df_anova2.isnull().iloc[:,0:3],axis=1)==3].to_numpy()
+    df_anova2 = df_anova2.drop(labels=unit_noresponse)
     number_selective = df_anova2.index[df_anova2.loc[:, 'number'] < 0.01].to_numpy()
     size_selective = df_anova2.index[df_anova2.loc[:, 'size'] < 0.01].to_numpy()
     interaction = df_anova2.index[df_anova2.loc[:, 'inter'] < 0.01].to_numpy()
-
-    number_units = np.setdiff1d(np.setdiff1d(number_selective, size_selective), interaction)
-    size_units = np.setdiff1d(np.setdiff1d(size_selective, number_selective), interaction)
+    # Populate the dataframe with selectivity:
+    df_selectivity.loc[np.setdiff1d(np.setdiff1d(number_selective, size_selective), interaction), 'selectivity'] = 'number'
+    df_selectivity.loc[np.setdiff1d(np.setdiff1d(size_selective, number_selective), interaction), 'selectivity'] = 'size'
     NS_units = np.intersect1d(number_selective, size_selective)
-    NS_NI_units = np.setdiff1d(NS_units, interaction)
-    NS_I_units = np.intersect1d(NS_units, interaction)
-    return number_units, size_units, NS_NI_units, NS_I_units
+    df_selectivity.loc[np.setdiff1d(NS_units, interaction), 'selectivity'] = 'NS NI'
+    df_selectivity.loc[np.intersect1d(NS_units, interaction), 'selectivity'] = 'NS I'
+    return df_selectivity
 
 
 
