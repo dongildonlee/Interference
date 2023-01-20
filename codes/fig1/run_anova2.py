@@ -1,5 +1,7 @@
 import numpy as np
 import pandas as pd
+import h5py
+import sys
 import os
 import time
 from joblib import Parallel, delayed
@@ -16,10 +18,12 @@ num_units_per_block = int(43264/num_blocks)
 
 numbers = np.arange(2,21,2)
 min_sz_idx=3; max_sz_idx=9
-sizes = np.arange(4,14)[min_sz_idx: min_sz_idx+1]
+sizes = np.arange(4,14)[min_sz_idx: max_sz_idx+1]
+inst = 500
 #################################################
 
 dir_path = os.path.dirname(os.path.realpath('../'))
+save_to_folder = dir_path+'/dataframes/ANOVA2'
 
 for net in nets:
     print("net:", net)
@@ -45,12 +49,12 @@ for net in nets:
             try:
                 unit_idx = np.arange(bk*num_units_per_block, (bk+1)*num_units_per_block)
                 start_time = time.time()
-                stats = Parallel(n_jobs=-1)(delayed(stats.anova2_single)(actv_2D, u, numbers, sizes, inst) for u in unit_idx)
+                anova_results = Parallel(n_jobs=-1)(delayed(stats.anova2_single)(actv_2D, u, numbers, sizes, inst) for u in unit_idx)
                 print("--- %s seconds ---" % (time.time() - start_time))
 
                 ## Save the data (save every time a block is complete):
-                stats_pval = pd.concat(stats).iloc[:,3].to_numpy().reshape(num_units_per_block,4)
-                df_anova2.iloc[unit_idx,:]=stats_pval
-                df_anova2.to_csv('ANOVA2 results/He/Relu'+str(relu)+'/size7to13/df_anova2 for He initialized net'+str(net)+'_relu'+str(relu)+'_epoch'+str(epoch)+' size 7to13 500inst.csv')
+                anova_pval = pd.concat(anova_results).iloc[:,3].to_numpy().reshape(num_units_per_block,4)
+                df_anova2.iloc[unit_idx,:]=anova_pval
+                df_anova2.to_csv(save_to_folder+'/df_anova2 for He initialized net'+str(net)+'_relu'+str(relu)+'_epoch'+str(epoch)+' size 7to13 500inst.csv')
             except:
                 continue
