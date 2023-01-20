@@ -1,5 +1,7 @@
 import numpy as np
 import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 import sys
 import os
 sys.path.append('../')
@@ -7,8 +9,8 @@ from packages import svm
 
 ############# Parameters ################
 relu=5;
-nets=np.array([1]);
-epochs=np.arange(0,1,10)
+nets=np.array([1,2]);
+epochs=np.arange(0,31,10)
 exps = np.arange(1,11) # SVM test trials
 
 selectivity = 'both'
@@ -44,3 +46,14 @@ for epoch in epochs:
         df_SVM_accuracy.iloc[i:i+2,3] = [acc_C, acc_IC]
         i+=2
 df_SVM_accuracy.to_csv(save_to_folder+'/SVM_accuracy.csv', index=True)
+
+
+# Plot training epoch vs SVM performance
+
+sns.set_style("white")
+ax=sns.lineplot(data=df_SVM_accuracy, x="epoch", y="accuracy", hue="congruency", palette=['g', 'r'], style='congruency', markers=False)
+plt.xlabel('Training epoch',fontsize=12)
+plt.ylabel('Accuracy', fontsize=12)
+plt.ylim(0.7,1)
+plt.tight_layout()
+plt.savefig(save_to_folder+'/training epoch vs SVM accuracy.pdf', transparent=True)
