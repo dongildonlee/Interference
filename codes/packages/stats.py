@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import statsmodels.api as sm
 from statsmodels.formula.api import ols
 
 # def anova2(actv,numer,area):
