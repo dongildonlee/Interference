@@ -1,42 +1,60 @@
 import numpy as np
 import pandas as pd
+from statsmodels.formula.api import ols
 
-def anova2(actv,numer,area):
-    ##
+# def anova2(actv,numer,area):
+#     ##
+#     # Input:
+#     #   1. actv: 4D activity matrix from DNN
+#     #   2. numer: numerosities
+#     #   3. area: areas
+#     # Output:
+#     #   Dataframe for a 2-way ANOVA
+#     ##
+#     categories = actv.shape[1]
+#     instances = actv.shape[2]
+#     actv_net2D = actv.reshape(actv.shape[0], categories*instances)
+#     # Find active units
+#     not_empty = np.any(actv_net2D,axis=1)
+#     inactv_units = [i for i,x in enumerate(not_empty) if not x]
+#     actv_units = np.setdiff1d(np.arange(43264),inactv_units)
+#     #
+#     df_stats = pd.DataFrame(index=np.arange(actv.shape[0]), columns = ['numer', 'area', 'inter','residual'])
+#     for i in actv_units:
+#         if i%1000 == 0:
+#             print("unit#:",i)
+#         df = pd.DataFrame({'numer': np.repeat(np.repeat(numer,len(numer)),instances),'area': np.tile(np.repeat(area,instances),len(area)),'activity':actv_net2D[i,:]})
+#         try:
+#             model = ols('activity ~ C(numer) + C(area) + C(numer):C(area)', data=df).fit()
+#             stat = sm.stats.anova_lm(model, typ=2)
+#             df_stats.loc[i,'numer'] = stat.loc['C(numer)', 'PR(>F)']
+#             df_stats.loc[i,'area'] = stat.loc['C(area)', 'PR(>F)']
+#             df_stats.loc[i,'inter'] = stat.loc['C(numer):C(area)', 'PR(>F)']
+#             df_stats.loc[i,'residual'] = stat.loc['Residual', 'PR(>F)']
+#         except:
+#             continue
+#     return df_stats
+
+
+def anova2_single(actv_2D, unit, numbers, sizes, instances):
+    ########################################################
     # Input:
-    #   1. actv: 4D activity matrix from DNN
-    #   2. numer: numerosities
-    #   3. area: areas
+    #   1. act_2D: 2D activity matrix from DNN
+    #   2. unit: unit whose activities will be analyzied
+    #   3. numbers
+    #   4. sizes
+    #   5. instances: number of instances per each (number,size) combnination
     # Output:
-    #   Dataframe for a 2-way ANOVA
-    ##
-    categories = actv.shape[1]
-    instances = actv.shape[2]
-    actv_net2D = actv.reshape(actv.shape[0], categories*instances)
-    # Find active units
-    not_empty = np.any(actv_net2D,axis=1)
-    inactv_units = [i for i,x in enumerate(not_empty) if not x]
-    actv_units = np.setdiff1d(np.arange(43264),inactv_units)
-    #
-    df_stats = pd.DataFrame(index=np.arange(actv.shape[0]), columns = ['numer', 'area', 'inter','residual'])
-    for i in actv_units:
-        if i%1000 == 0:
-            print("unit#:",i)
-        df = pd.DataFrame({'numer': np.repeat(np.repeat(numer,len(numer)),instances),'area': np.tile(np.repeat(area,instances),len(area)),'activity':actv_net2D[i,:]})
-        try:
-            model = ols('activity ~ C(numer) + C(area) + C(numer):C(area)', data=df).fit()
-            stat = sm.stats.anova_lm(model, typ=2)
-            df_stats.loc[i,'numer'] = stat.loc['C(numer)', 'PR(>F)']
-            df_stats.loc[i,'area'] = stat.loc['C(area)', 'PR(>F)']
-            df_stats.loc[i,'inter'] = stat.loc['C(numer):C(area)', 'PR(>F)']
-            df_stats.loc[i,'residual'] = stat.loc['Residual', 'PR(>F)']
-        except:
-            continue
-    return df_stats
+    #   anova2 result for the unit
+    ########################################################
+    df = pd.DataFrame({'number': np.repeat(np.repeat(numbers,len(sizes)),instances),'size': np.tile(np.repeat(sizes,instances),len(numbers)),'activity':actv_2D[unit,:]})
+    model = ols('activity ~ C(number) + C(size) + C(number):C(size)', data=df).fit()
+    stat = sm.stats.anova_lm(model, typ=2)
+    return stat
 
 
 def gaussian_curve_fit(numbers, sizes, uoi, actv_net):
-    ###
+    ########################################################
     ## INPUT:
     #   1. numbers: an array of numbers
     #   2. sizes: np array of sizes
@@ -44,7 +62,7 @@ def gaussian_curve_fit(numbers, sizes, uoi, actv_net):
     #   4. actv_net: raw activity data (e.g. 43264 x 100 x 100 shape)
     ## OUTPUT:
     #   Fitted parameters
-    ###
+    ########################################################
 
     # average activity data across instances (e.g.n=100) and reshape the structure to (# of neurons)x(# of numbers)x(# of sizes)
     x = np.log2(numbers)
