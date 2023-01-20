@@ -110,24 +110,44 @@ def get_all_text_X(exps):
     return all_test_X
 
 
-def get_all_preds(net, relu, epoch, num_samples, selectivity, exps):
+def get_all_preds(net, relu, epoch, num_units, selectivity, exps):
+    ###########################################################
+    ## INPUT:
+    #   1. net: network ID #
+    #   2. relu: relu layer #
+    #   3. epoch: training epoch #
+    #   4. num_units: number of units used in SVM
+    #   5. selevtivity: number, size or NS (number and size)
+    #   6. exps: SVM test trials
+    ## OUTPUT:
+    #   predictions on the SVM test trials
+    ###########################################################
     dir_path = os.path.dirname(os.path.realpath('../'))
-    all_preds=pd.concat([pd.read_csv(dir_path+'/dataframes/SVM_predictions/SVM prediction of He untrained net'+str(net)+' relu'+str(relu)+' epoch'+str(epoch)+' '+str(num_samples)+' '+str(selectivity)+' units that are randomly drawn from distribution exp' + str(exp)+ ' Jan2023.csv').drop(columns=['Unnamed: 0']) for exp in exps])
+    all_preds=pd.concat([pd.read_csv(dir_path+'/dataframes/SVM_predictions/SVM prediction of He untrained net'+str(net)+' relu'+str(relu)+' epoch'+str(epoch)+' '+str(num_units)+' '+str(selectivity)+' units that are randomly drawn from distribution exp' + str(exp)+ ' Jan2023.csv').drop(columns=['Unnamed: 0']) for exp in exps])
     all_preds.index = np.arange(all_preds.shape[0])
     return all_preds
 
 
 def get_SVM_accuracy(pair_idx, all_test_X, all_preds):
+    ###########################################################
+    ## INPUT:
+    #   1. pair_idx: SVM test trial #
+    #   2. indices corresponding to congruent/incongruent trials
+    #   3. all_test_X: test SVM trials
+    #   4. all_preds: predictions on the SVM trials
+    ## OUTPUT:
+    #   SVM accuracy
+    ###########################################################
     test_arr = ((all_test_X['num1'] > all_test_X['num2'])*2-1).to_numpy()[pair_idx]
     pred_arr = all_preds['0'].to_numpy()[pair_idx]
     accuracy = sum(test_arr == pred_arr)/len(test_arr)
     return accuracy
 
 
-def get_all_preds_temp(file):
-    all_preds=pd.concat([pd.read_csv(file+' exp' + str(exp)+ ' Dec12.csv').drop(columns=['Unnamed: 0']) for exp in np.arange(1,11)])
-    all_preds.index = np.arange(all_preds.shape[0])
-    return all_preds
+# def get_all_preds_temp(file):
+#     all_preds=pd.concat([pd.read_csv(file+' exp' + str(exp)+ ' Dec12.csv').drop(columns=['Unnamed: 0']) for exp in np.arange(1,11)])
+#     all_preds.index = np.arange(all_preds.shape[0])
+#     return all_preds
 
 
 def get_congruency(test_X, variable):
