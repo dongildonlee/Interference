@@ -14,7 +14,7 @@ def get_actv_net(net,relu,epoch):
     ###
     start_time = time.time()
     dir_path = os.path.dirname(os.path.realpath('../'))
-    print(dir_path)
+    #print(dir_path)
     Unt_f500 = h5py.File(dir_path+'/data/raw_response/actv_f500_network'+str(net)+'_relu'+str(relu)+'_epoch'+str(epoch)+'.mat', 'r')
     actv_ = Unt_f500['actv'][:]
     actv = np.transpose(actv_, (2,1,0))
