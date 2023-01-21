@@ -8,8 +8,8 @@ from packages import stats
 
 ############# Parameters ################
 relu=5
-nets = np.arange(1,2)
-epochs=np.arange(0,10,10)
+nets = np.arange(1,3)
+epochs=np.arange(0,90,30)
 #########################################
 
 dir_path = os.path.dirname(os.path.realpath('../'))
