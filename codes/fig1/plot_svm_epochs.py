@@ -19,7 +19,7 @@ congruency=np.array(['C','IC'])
 #########################################
 
 dir_path = os.path.dirname(os.path.realpath('../'))
-save_to_folder = dir_path+'/dataframes/SVM_analysis'
+save_to_folder = dir_path+'/figures'
 
 # Make a dataframe to store SVM performance:
 num_rows = len(nets)*len(epochs)*len(congruency)
