@@ -1,3 +1,44 @@
-# Deep Neural Network simulation for the study of magnitude representation and interference among visual variables in images.
+# Number-Space Interference in DNNs (*Demo*)
 
-This Github repo contains codes written in MATLAB, python languages that I've been working on for my computational neuroscience project at Korea Advanced Institute of Science and Technology (KAIST).  
+### Analysis of DNNs' behaviors to visual features (e.g. numerosities and item size) in images 
+
+**Contact**:<br/>
+Email: ummathecon@gmail.com<br/>
+LinkedIn: [Click here](https://www.linkedin.com/in/dongil-lee-b71b1370/)
+<br/>
+
+---
+## What this repo is for:
+This project is designed to showcase part of my project in computational neuroscience at Korea Advanced Institute of Science and Technology (KAIST). Using the code, you will be able to:
+
+* Generate an image set and feed it to deep neural networks to generate response data (in **MATLAB**)
+* Analyze the DNN response data and produce two figures showing key findings (In **Python**)
+___
+<br />
+
+## 1. System requirements
+* MATALB 2021 or later version (for data generation)
+* Deep Learning Toolbox (MATLAB. For download, click [here](https://www.mathworks.com/products/deep-learning.html))
+* Python 3.8 or later (for everything else)
+
+
+## 2. Installation
+* Download all files (_Recommended_)
+* If wishing to skip data generation (MATLAB), download all except **'gen_data'** folder 
+
+## 3. Instructions
+All scripts are made runnable immediately (using data included for demo purposes) without having to run their dependencies. If you wish to learn a little deeper, try following these steps in order: 
+
+_a. For data generation:_
+* Untrained DNNs by running '_get_multi_alexnet.m_'
+* Generate an image set by running '_get_stimulus_set.m_'
+* Feed the image set to the DNNs and generate response data by running '_get_actv_from_training_epochs_'
+
+_b. For data analysis:_
+* Perform 2-way ANOVA (run: '_run_anova2.py_')
+* Find selective DNN units (run: '_find_selectivity.py_')
+* Perform Support Vector Machine (SVM) (run: '_run_svm.py_')
+* Plot fig1 (run: '_plot_svm_epochs.py_')
+* Plot fig2 (run: '_get_all_SVM_data.py_' and then '_plot_numratio_vs_accuracy.py_')
+
+
