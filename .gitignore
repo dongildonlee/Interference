@@ -1,0 +1,12 @@
+data/
+*.csv
+*.pdf
+*.pkl
+
+codes/gen_data/
+*.mat
+
+codes/fig1/Untitled1.ipynb
+codes/fig1/run_anova2.ipynb
+codes/fig1/.ipynb_checkpoints/run_anova2-checkpoint.ipynb
+
